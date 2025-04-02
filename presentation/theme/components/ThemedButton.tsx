@@ -1,22 +1,21 @@
-import { Text, Pressable, StyleSheet, PressableProps } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableOpacityProps,
+} from "react-native";
 import React from "react";
 import { Colors } from "@/constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-interface Props extends PressableProps {
+interface Props extends TouchableOpacityProps {
   children: React.ReactNode;
   iconName?: keyof typeof Ionicons.glyphMap;
 }
 
-const ThemedButton = ({ children, iconName, ...rest }: Props) => {
+const ThemedButton = ({ children, iconName, style, ...rest }: Props) => {
   return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.button,
-        pressed ? { opacity: 0.7 } : { opacity: 1 },
-      ]}
-      {...rest}
-    >
+    <TouchableOpacity style={[styles.button, style]} {...rest}>
       <Text style={styles.textButton}>{children}</Text>
       {iconName && (
         <Ionicons
@@ -26,7 +25,7 @@ const ThemedButton = ({ children, iconName, ...rest }: Props) => {
           style={{ marginTop: 2.5 }}
         />
       )}
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 

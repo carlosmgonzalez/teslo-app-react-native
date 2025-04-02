@@ -1,19 +1,26 @@
-import { StyleSheet, View } from "react-native";
-import React from "react";
-import { ThemedText } from "@/presentation/theme/components/ThemedText";
-import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useProducts } from "@/presentation/products/hooks/useProducts";
+import ProductList from "@/presentation/products/components/ProductList";
+import LoadingIndicator from "@/presentation/theme/components/LoadingIndicator";
+import { FAB } from "@/presentation/theme/components/FAB";
+import { router } from "expo-router";
 
 const HomeScreen = () => {
-  const primary = useThemeColor({}, "primary");
+  const { productsQuery, loadNextPage } = useProducts();
+  const { isLoading, data } = productsQuery;
+
+  if (isLoading) return <LoadingIndicator />;
 
   return (
     <View style={styles.container}>
-      <ThemedText style={{ fontFamily: "KanitBold", color: primary }}>
-        index
-      </ThemedText>
-      <ThemedText style={{ fontFamily: "KanitRegular" }}>index</ThemedText>
-      <ThemedText style={{ fontFamily: "KanitThin" }}>index</ThemedText>
-      <ThemedText>index</ThemedText>
+      <ProductList
+        products={data?.pages.flatMap((page) => page) ?? []}
+        loadNextPage={loadNextPage}
+      />
+      <FAB
+        iconName="add-outline"
+        onPress={() => router.push("/(teslo-app)/product/new")}
+      />
     </View>
   );
 };
@@ -22,7 +29,7 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 40,
     paddingHorizontal: 10,
+    flex: 1,
   },
 });
