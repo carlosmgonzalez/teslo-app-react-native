@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { Redirect, router, Stack, useLocalSearchParams } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -19,8 +20,11 @@ import { useEffect } from "react";
 import ThemedButtonGroup from "@/presentation/theme/components/ThemedButtonGroup";
 import ThemedButton from "@/presentation/theme/components/ThemedButton";
 import { useForm, Controller } from "react-hook-form";
+import { useCameraStore } from "@/presentation/camera/store/useCameraStore";
 
 const ProductScreen = () => {
+  const { selectedImages, clearImage } = useCameraStore();
+
   const { id }: { id: string } = useLocalSearchParams();
   const textColor = useThemeColor({}, "text");
 
@@ -30,23 +34,30 @@ const ProductScreen = () => {
   const sizes: string[] = Object.values(Size);
   const genders = Object.values(Gender);
 
-  const { handleSubmit, control, reset } = useForm<Product>({
-    defaultValues: {
-      title: "",
-      images: [],
-      slug: "",
-      description: "",
-      price: 0,
-      stock: 0,
-      sizes: [],
-      gender: undefined,
-    },
-  });
+  const { handleSubmit, control, reset, setValue, getValues } =
+    useForm<Product>({
+      defaultValues: {
+        title: "",
+        images: [],
+        slug: "",
+        description: "",
+        price: 0,
+        stock: 0,
+        sizes: [],
+        gender: undefined,
+      },
+    });
+
+  useEffect(() => {
+    return () => {
+      clearImage();
+    };
+  }, []);
 
   useEffect(() => {
     if (!data) return;
     reset(data);
-  }, [data, reset]);
+  }, [data, selectedImages, reset]);
 
   if (isLoading) return <LoadingIndicator />;
   if (!data) return <Redirect href="/" />;
@@ -62,12 +73,24 @@ const ProductScreen = () => {
     data.stock = Number(data.stock);
     data.price = Number(data.price);
 
-    productMutation.mutate(data);
+    productMutation.mutate({
+      ...data,
+      images: [...data.images, ...selectedImages],
+    });
   };
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }}>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={productQuery.isFetching}
+            onRefresh={async () => {
+              await productQuery.refetch();
+            }}
+          />
+        }
+      >
         <View style={styles.container}>
           <Stack.Screen
             options={{
@@ -88,7 +111,7 @@ const ProductScreen = () => {
               control={control}
               name="images"
               render={({ field: { value } }) => (
-                <ProductImages images={value} />
+                <ProductImages images={[...value, ...selectedImages]} />
               )}
             />
 
