@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "teslo-app",
+    "name": "Teslo Shop",
     "slug": "teslo-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.carlosmgonzalez.tesloapp"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "b6e1ffc1-6fa9-4e1b-94b7-a53a53240322"
+      }
     }
   }
 }
